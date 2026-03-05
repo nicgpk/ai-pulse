@@ -1,0 +1,125 @@
+/* ═══════════════════════════════════════════════════════════
+   MIDASHANDS DESIGN TOKENS
+   Source: github.com/nicgpk/midashands/tokens-json/
+
+   These CSS custom properties are pulled directly from the
+   midashands design system. They power every visual decision
+   in the app — colors, spacing, borders, shadows, etc.
+
+   HOW IT WORKS:
+   - The [data-theme="dark"] selector applies dark mode tokens
+   - The [data-theme="light"] selector applies light mode tokens
+   - Components just reference var(--token-name) and the
+     correct value is used automatically based on the theme.
+   ═══════════════════════════════════════════════════════════ */
+
+
+/* ── Dark Theme (default) ─────────────────────────────────── */
+[data-theme="dark"] {
+  /* Core colors */
+  --color-background: #0A0A0A;
+  --color-foreground: #FAFAFA;
+  --color-primary: #FAFAFA;
+  --color-primary-foreground: #0A0A0A;
+  --color-secondary: #262626;
+  --color-secondary-foreground: #FAFAFA;
+  --color-accent: #262626;
+  --color-accent-foreground: #FAFAFA;
+  --color-muted: #262626;
+  --color-muted-foreground: #A1A1AA;
+  --color-destructive: #991B1B;
+  --color-destructive-foreground: #FAFAFA;
+
+  /* Border tokens */
+  --color-border: #262626;
+  --color-border-subtle: #1A1A1A;
+  --color-border-strong: #404040;
+  --color-border-hover: #404040;
+  --color-border-focus: #D4D4D4;
+  --color-border-error: #DC2626;
+  --color-border-success: #16A34A;
+  --color-border-warning: #D97706;
+  --color-border-info: #0EA5E9;
+
+  /* Focus ring */
+  --color-ring: #D4D4D4;
+}
+
+
+/* ── Light Theme ──────────────────────────────────────────── */
+[data-theme="light"] {
+  --color-background: #FAFAFA;
+  --color-foreground: #0A0A0A;
+  --color-primary: #171717;
+  --color-primary-foreground: #FAFAFA;
+  --color-secondary: #F5F5F5;
+  --color-secondary-foreground: #171717;
+  --color-accent: #F5F5F5;
+  --color-accent-foreground: #171717;
+  --color-muted: #F5F5F5;
+  --color-muted-foreground: #737373;
+  --color-destructive: #DC2626;
+  --color-destructive-foreground: #FAFAFA;
+
+  --color-border: #E5E5E5;
+  --color-border-subtle: #F0F0F0;
+  --color-border-strong: #D4D4D4;
+  --color-border-hover: #A3A3A3;
+  --color-border-focus: #171717;
+  --color-border-error: #DC2626;
+  --color-border-success: #16A34A;
+  --color-border-warning: #D97706;
+  --color-border-info: #0EA5E9;
+
+  --color-ring: #171717;
+}
+
+
+/* ── Spacing Scale (4px baseline) ─────────────────────────── */
+:root {
+  --spacing-1: 0.25rem;   /* 4px */
+  --spacing-2: 0.5rem;    /* 8px */
+  --spacing-3: 0.75rem;   /* 12px */
+  --spacing-4: 1rem;      /* 16px */
+  --spacing-6: 1.5rem;    /* 24px */
+  --spacing-8: 2rem;      /* 32px */
+  --spacing-10: 2.5rem;   /* 40px */
+  --spacing-12: 3rem;     /* 48px */
+}
+
+
+/* ── Border Radius ────────────────────────────────────────── */
+:root {
+  --radius-none: 0;
+  --radius-sm: 0.125rem;  /* 2px */
+  --radius-md: 0.375rem;  /* 6px */
+  --radius-lg: 0.5rem;    /* 8px */
+  --radius-xl: 0.75rem;   /* 12px */
+  --radius-full: 9999px;
+}
+
+
+/* ── Shadow System ────────────────────────────────────────── */
+:root {
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --shadow-focus-ring: 0 0 0 2px var(--color-background), 0 0 0 4px var(--color-ring);
+}
+
+
+/* ── Transitions ──────────────────────────────────────────── */
+:root {
+  --transition-fast: 150ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease;
+}
+
+
+/* ── Typography ───────────────────────────────────────────── */
+:root {
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+}

@@ -1,0 +1,422 @@
+/* ═══════════════════════════════════════════════════════════
+   APP STYLES — Uses midashands tokens via var() references
+
+   These classes reference the CSS custom properties defined
+   in tokens.css. When the theme changes (dark ↔ light),
+   the token values swap and these styles update automatically.
+   ═══════════════════════════════════════════════════════════ */
+
+
+/* ── Base ─────────────────────────────────────────────────── */
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  transition: background var(--transition-normal), color var(--transition-normal);
+}
+
+
+/* ── Layout ───────────────────────────────────────────────── */
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-inner {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-6);
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .app-inner {
+    padding: 0 var(--spacing-4);
+  }
+}
+
+
+/* ── Header ───────────────────────────────────────────────── */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid var(--color-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+[data-theme="dark"] .header {
+  background: rgba(10, 10, 10, 0.9);
+}
+
+[data-theme="light"] .header {
+  background: rgba(250, 250, 250, 0.9);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-3) 0;
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+}
+
+.header-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+.header-badge {
+  font-size: 0.6875rem;
+  color: var(--color-muted-foreground);
+  border: 1px solid var(--color-border);
+  padding: 1px var(--spacing-2);
+  border-radius: var(--radius-sm);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+}
+
+
+/* ── Buttons (mirroring midashands btn patterns) ──────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-2);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus-ring);
+}
+
+/* btn-primary */
+.btn-primary {
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+  border: 1px solid var(--color-primary);
+  padding: var(--spacing-2) var(--spacing-6);
+}
+
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+/* btn-outline */
+.btn-outline {
+  background: transparent;
+  color: var(--color-foreground);
+  border: 1px solid var(--color-border);
+  padding: var(--spacing-2) var(--spacing-3);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: var(--color-secondary);
+  border-color: var(--color-border-strong);
+}
+
+/* btn-sm */
+.btn-sm {
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: 0.75rem;
+}
+
+
+/* ── Tab Navigation (mirrors btn-group) ───────────────────── */
+.tab-nav {
+  display: flex;
+  gap: var(--spacing-1);
+  flex-wrap: wrap;
+  padding: var(--spacing-4) 0 0;
+}
+
+.tab-btn {
+  background: transparent;
+  color: var(--color-muted-foreground);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-2) var(--spacing-4);
+  font-size: 0.875rem;
+  font-weight: 400;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  line-height: 1.5;
+}
+
+.tab-btn:hover {
+  color: var(--color-foreground);
+  background: var(--color-secondary);
+}
+
+.tab-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus-ring);
+}
+
+.tab-btn[data-active="true"] {
+  background: var(--color-secondary);
+  color: var(--color-foreground);
+  border-color: var(--color-border-strong);
+  font-weight: 500;
+}
+
+
+/* ── Content Area ─────────────────────────────────────────── */
+.content {
+  flex: 1;
+  padding-bottom: var(--spacing-12);
+}
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-3) 0 var(--spacing-2);
+  border-bottom: 1px solid var(--color-border-subtle);
+  margin-bottom: var(--spacing-1);
+}
+
+.status-text {
+  font-size: 0.75rem;
+  color: var(--color-muted-foreground);
+}
+
+.status-source {
+  font-size: 0.6875rem;
+  color: var(--color-muted-foreground);
+  opacity: 0.6;
+}
+
+
+/* ── News Card ────────────────────────────────────────────── */
+.news-card {
+  display: block;
+  animation: fadeIn 0.3s ease both;
+}
+
+.news-card-inner {
+  padding: var(--spacing-4) 0;
+  border-bottom: 1px solid var(--color-border-subtle);
+  transition: border-color var(--transition-fast);
+}
+
+.news-card:hover .news-card-inner {
+  border-color: var(--color-border-hover);
+}
+
+.news-card-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  margin-bottom: var(--spacing-2);
+  flex-wrap: wrap;
+}
+
+.news-card-tag {
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--color-foreground);
+  background: var(--color-secondary);
+  border: 1px solid var(--color-border);
+  padding: 2px var(--spacing-2);
+  border-radius: var(--radius-sm);
+}
+
+.news-card-source,
+.news-card-date {
+  font-size: 0.75rem;
+  color: var(--color-muted-foreground);
+}
+
+.news-card-date {
+  margin-left: auto;
+}
+
+.news-card-title {
+  font-size: 1.0625rem;
+  font-weight: 500;
+  line-height: 1.4;
+  margin-bottom: var(--spacing-1);
+  color: var(--color-foreground);
+}
+
+.news-card-summary {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--color-muted-foreground);
+  max-width: 40rem;
+}
+
+
+/* ── Video Card ───────────────────────────────────────────── */
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--spacing-4);
+  padding-top: var(--spacing-3);
+}
+
+.video-card {
+  display: block;
+  animation: fadeIn 0.3s ease both;
+}
+
+.video-card-inner {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  background: var(--color-background);
+}
+
+.video-card:hover .video-card-inner {
+  border-color: var(--color-border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+.video-card-thumb {
+  height: 160px;
+  position: relative;
+  background: var(--color-secondary);
+  overflow: hidden;
+}
+
+.video-card-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-card-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.video-card-play {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-card-play span {
+  color: var(--color-primary-foreground);
+  font-size: 14px;
+  margin-left: 2px;
+}
+
+.video-card-body {
+  padding: var(--spacing-3) var(--spacing-4);
+}
+
+.video-card-title {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--color-foreground);
+  margin-bottom: var(--spacing-1);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.video-card-channel {
+  font-size: 0.75rem;
+  color: var(--color-muted-foreground);
+}
+
+
+/* ── Loading Skeleton ─────────────────────────────────────── */
+.skeleton-line {
+  background: var(--color-secondary);
+  border-radius: var(--radius-sm);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.skeleton-line-subtle {
+  background: var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+
+/* ── Empty / Error State ──────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-12) var(--spacing-4);
+}
+
+.empty-state p {
+  font-size: 0.875rem;
+  color: var(--color-muted-foreground);
+  margin-bottom: var(--spacing-4);
+}
+
+
+/* ── Footer ───────────────────────────────────────────────── */
+.footer {
+  border-top: 1px solid var(--color-border-subtle);
+  padding: var(--spacing-4) 0;
+  text-align: center;
+}
+
+.footer span {
+  font-size: 0.75rem;
+  color: var(--color-muted-foreground);
+}
+
+
+/* ── Animations ───────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
