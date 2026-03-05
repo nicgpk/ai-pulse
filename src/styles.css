@@ -388,6 +388,31 @@ body {
 }
 
 
+/* ── Load more ────────────────────────────────────────────── */
+.load-more {
+  display: flex;
+  justify-content: center;
+  padding: var(--spacing-8) 0 var(--spacing-4);
+}
+
+
+/* ── Tab ready dot (pre-fetched indicator) ────────────────── */
+.tab-btn {
+  position: relative;
+}
+
+.tab-ready-dot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-full);
+  background: var(--color-muted-foreground);
+  margin-left: var(--spacing-1);
+  opacity: 0.5;
+  vertical-align: middle;
+}
+
+
 /* ── Footer ───────────────────────────────────────────────── */
 .footer {
   border-top: 1px solid var(--color-border-subtle);
@@ -401,6 +426,104 @@ body {
 }
 
 
+/* ── Toggle (from midashands toggle component) ────────────── */
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2);
+  cursor: pointer;
+  user-select: none;
+}
+
+.toggle-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  background: var(--color-input);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-full);
+  transition: var(--transition-all);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.toggle-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background: var(--color-foreground);
+  border-radius: var(--radius-full);
+  transition: var(--transition-all);
+  box-shadow: var(--shadow-sm);
+}
+
+.toggle-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-foreground);
+  line-height: 1;
+}
+
+/* Checked state */
+.toggle-input:checked + .toggle-switch {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.toggle-input:checked + .toggle-switch::after {
+  left: 22px;
+  background: var(--color-primary-foreground);
+}
+
+/* Hover state */
+.toggle:hover .toggle-switch {
+  border-color: var(--color-primary);
+}
+
+/* Focus state */
+.toggle-input:focus-visible + .toggle-switch {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+}
+
+/* Small size */
+.toggle-sm .toggle-switch {
+  width: 36px;
+  height: 20px;
+}
+
+.toggle-sm .toggle-switch::after {
+  width: 12px;
+  height: 12px;
+  top: 2px;
+  left: 2px;
+}
+
+.toggle-sm .toggle-input:checked + .toggle-switch::after {
+  left: 18px;
+}
+
+.toggle-sm .toggle-label {
+  font-size: var(--font-size-xs);
+}
+
+/* Theme toggle label colour */
+.theme-toggle-label {
+  color: var(--color-muted-foreground);
+  min-width: 2.5rem;
+}
+
+
 /* ── Animations ───────────────────────────────────────────── */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
@@ -410,6 +533,11 @@ body {
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
+}
+
+@keyframes logo-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(0.8); }
 }
 
 @keyframes spin {

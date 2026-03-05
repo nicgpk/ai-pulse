@@ -1,4 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
   <rect width="32" height="32" rx="6" fill="#0A0A0A"/>
-  <text x="16" y="22" text-anchor="middle" font-family="system-ui" font-weight="700" font-size="16" fill="#FAFAFA">AI</text>
+  <circle cx="16" cy="16" r="6" fill="white">
+    <animateTransform
+      attributeName="transform"
+      type="scale"
+      values="1;0.8;1"
+      dur="2s"
+      repeatCount="indefinite"
+      additive="sum"
+      calcMode="spline"
+      keySplines="0.45 0.05 0.55 0.95; 0.45 0.05 0.55 0.95"
+    />
+  </circle>
 </svg>
