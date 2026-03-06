@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { CATEGORIES, fetchNews, fetchVideos } from "./feeds.js";
 import "./tokens.css";
 import "./tab.css";
 import "./styles.css";
 
 const PAGE_SIZE = 10;
+const CACHE_TTL = 15 * 60 * 1000; // 15 minutes
 
 // ── Date filter helper ────────────────────────────────────────
 function filterByDate(articles, filter) {
@@ -12,7 +13,7 @@ function filterByDate(articles, filter) {
   const cutoff = filter === "today" ? 24 * 3_600_000 : 7 * 24 * 3_600_000;
   const now = Date.now();
   return articles.filter((a) => {
-    if (!a.rawDate) return true; // no date info — show it
+    if (!a.rawDate) return true;
     try {
       return now - new Date(a.rawDate).getTime() <= cutoff;
     } catch {
@@ -47,6 +48,8 @@ export default function App() {
   const [status, setStatus] = useState("");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [dateFilter, setDateFilter] = useState("all");
+  const [search, setSearch] = useState("");
+  const [activeSources, setActiveSources] = useState(new Set());
   const sentinelRef = useRef(null);
 
   // ── Theme ────────────────────────────────────────────────
@@ -73,7 +76,9 @@ export default function App() {
   // ── Data Loading ─────────────────────────────────────────
   const loadCategory = useCallback(
     async (categoryId, forceRefresh = false) => {
-      if (!forceRefresh && cache[categoryId]?.length > 0) return;
+      const age = Date.now() - (lastUpdated[categoryId] || 0);
+      const isFresh = cache[categoryId]?.length > 0 && age < CACHE_TTL;
+      if (!forceRefresh && isFresh) return;
 
       if (categoryId === activeCategory) {
         setLoading(true);
@@ -94,7 +99,7 @@ export default function App() {
         if (categoryId === activeCategory) setLoading(false);
       }
     },
-    [cache, activeCategory]
+    [cache, lastUpdated, activeCategory]
   );
 
   const loadVideos = useCallback((categoryId) => {
@@ -115,43 +120,85 @@ export default function App() {
     others.forEach((c) => loadCategory(c.id));
   }, []); // once on mount
 
+  // Auto-refresh active category after TTL
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadCategory(activeCategory, true);
+    }, CACHE_TTL);
+    return () => clearInterval(interval);
+  }, [activeCategory]); // resets timer on tab change
+
   // Fetch videos for the active tab (cached)
   useEffect(() => {
     if (videoCache[activeCategory]) return;
     loadVideos(activeCategory);
   }, [activeCategory]);
 
-  // Reset pagination and filter on tab change
+  // Reset pagination, filters, and search on tab change
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
     setDateFilter("all");
+    setSearch("");
+    setActiveSources(new Set());
   }, [activeCategory]);
 
-  // Reset pagination on filter change
+  // Reset pagination on any filter change
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
-  }, [dateFilter]);
+  }, [dateFilter, search, activeSources]);
 
   // ── Derived values ───────────────────────────────────────
   const articles = cache[activeCategory] || [];
-  const filteredArticles = filterByDate(articles, dateFilter);
   const videos = videoCache[activeCategory] || [];
   const isVideoLoading = videoLoading[activeCategory] ?? false;
+  const updatedAt = lastUpdated[activeCategory];
+  const updatedText = updatedAt ? `Updated ${formatRelativeTime(updatedAt)}` : "";
+
+  // Unique sorted sources for filter pills
+  const allSources = [...new Set(articles.map((a) => a.source).filter(Boolean))].sort();
+
+  const toggleSource = (source) => {
+    setActiveSources((prev) => {
+      const next = new Set(prev);
+      if (next.has(source)) next.delete(source);
+      else next.add(source);
+      return next;
+    });
+  };
+
+  // Apply filters: date → source → search
+  let filteredArticles = filterByDate(articles, dateFilter);
+  if (activeSources.size > 0) {
+    filteredArticles = filteredArticles.filter((a) => activeSources.has(a.source));
+  }
+  if (search.trim()) {
+    const q = search.toLowerCase();
+    filteredArticles = filteredArticles.filter(
+      (a) =>
+        a.title.toLowerCase().includes(q) ||
+        (a.summary || "").toLowerCase().includes(q)
+    );
+  }
+
   const visibleArticles = filteredArticles.slice(0, visibleCount);
   const hasMore = filteredArticles.length > visibleCount;
-  const updatedAt = lastUpdated[activeCategory];
 
-  // Status text
-  const updatedText = updatedAt ? `Updated ${formatRelativeTime(updatedAt)}` : "";
+  const isFiltered = dateFilter !== "all" || activeSources.size > 0 || search.trim();
   const statusText = loading
     ? status
     : articles.length > 0
-    ? dateFilter !== "all"
+    ? isFiltered
       ? filteredArticles.length > 0
         ? `${filteredArticles.length} of ${articles.length} stories`
-        : "No stories in this period"
+        : "No matching stories"
       : `${articles.length} stories`
     : "";
+
+  const clearFilters = () => {
+    setDateFilter("all");
+    setSearch("");
+    setActiveSources(new Set());
+  };
 
   // Infinite scroll — load next page when sentinel enters viewport
   useEffect(() => {
@@ -177,9 +224,7 @@ export default function App() {
             <div className="header-logo">
               <PulseLogo />
               <h1 className="header-title">Pulse</h1>
-            </div>
-            <div className="header-actions">
-<button
+              <button
                 className="btn btn-outline btn-sm"
                 onClick={toggleDensity}
                 aria-label={density === "comfortable" ? "Switch to compact view" : "Switch to comfortable view"}
@@ -198,6 +243,22 @@ export default function App() {
                   {theme === "dark" ? "Dark" : "Light"}
                 </span>
               </label>
+            </div>
+            <div className="header-search">
+              <div className="search-field">
+                <svg className="search-icon" width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                  <circle cx="5.5" cy="5.5" r="4" stroke="currentColor" strokeWidth="1.5"/>
+                  <path d="M9 9L12.5 12.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+                <input
+                  className="search-input"
+                  type="search"
+                  placeholder="Search articles"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  aria-label="Search articles"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -223,6 +284,7 @@ export default function App() {
 
       {/* ── CONTENT ── */}
       <main className="app-inner content">
+        {/* Status bar + date filter */}
         <div className="status-bar">
           <span className="status-text">
             {statusText}
@@ -231,7 +293,7 @@ export default function App() {
             )}
           </span>
           {!loading && articles.length > 0 && (
-            <div className="filter-group" role="group" aria-label="Date filter">
+            <div className="tab-list tab-list-boxed tab-list-sm" role="group" aria-label="Date filter">
               {[
                 { id: "today", label: "Today" },
                 { id: "week",  label: "Week"  },
@@ -239,8 +301,8 @@ export default function App() {
               ].map((f) => (
                 <button
                   key={f.id}
-                  className="filter-btn"
-                  data-active={dateFilter === f.id}
+                  className="tab-trigger"
+                  aria-selected={dateFilter === f.id}
                   onClick={() => setDateFilter(f.id)}
                 >
                   {f.label}
@@ -249,6 +311,24 @@ export default function App() {
             </div>
           )}
         </div>
+
+        {/* Source filter pills */}
+        {!loading && allSources.length > 1 && (
+          <div className="source-bar" role="group" aria-label="Filter by source">
+            <div className="tab-list tab-list-boxed tab-list-sm">
+              {allSources.map((src) => (
+                <button
+                  key={src}
+                  className="tab-trigger"
+                  aria-pressed={activeSources.has(src)}
+                  onClick={() => toggleSource(src)}
+                >
+                  {src}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {loading ? (
           <LoadingSkeleton />
@@ -274,35 +354,33 @@ export default function App() {
           </div>
         ) : (
           <>
-            {/* Videos first — above the fold */}
-            {isVideoLoading ? (
-              <VideoLoadingSkeleton />
-            ) : videos.length > 0 ? (
-              <div className="video-section">
-                <h2 className="video-section-title">Watch</h2>
-                <div className="video-grid">
-                  {videos.map((v, i) => (
-                    <VideoCard key={v.videoId || i} video={v} index={i} />
-                  ))}
-                </div>
-              </div>
-            ) : null}
-
-            {/* Articles */}
             {filteredArticles.length === 0 ? (
               <div className="empty-state">
-                <p>No stories from this period.</p>
-                <button
-                  className="btn btn-outline"
-                  onClick={() => setDateFilter("all")}
-                >
-                  Show all stories
+                <p>No matching stories.</p>
+                <button className="btn btn-outline" onClick={clearFilters}>
+                  Clear filters
                 </button>
               </div>
             ) : (
               <>
                 {visibleArticles.map((article, i) => (
-                  <NewsCard key={article.url || i} article={article} index={i} compact={density === "compact"} />
+                  <React.Fragment key={article.url || i}>
+                    <NewsCard article={article} index={i} compact={density === "compact"} />
+                    {i === 4 && (
+                      isVideoLoading ? (
+                        <VideoLoadingSkeleton />
+                      ) : videos.length > 0 ? (
+                        <div className="video-section">
+                          <h2 className="video-section-title">Watch</h2>
+                          <div className="video-grid">
+                            {videos.map((v, vi) => (
+                              <VideoCard key={v.videoId || vi} video={v} index={vi} />
+                            ))}
+                          </div>
+                        </div>
+                      ) : null
+                    )}
+                  </React.Fragment>
                 ))}
                 {hasMore && <div ref={sentinelRef} style={{ height: 1 }} />}
               </>

@@ -20,7 +20,7 @@ export const CATEGORIES = [
   { id: "general",     label: "Top Stories", hnQuery: "artificial intelligence AI" },
   { id: "engineering", label: "Engineering", hnQuery: "AI developer tools LLM API coding assistant" },
   { id: "design",      label: "Design",      hnQuery: "AI design tools UX product design figma generative" },
-  { id: "product",     label: "Product",     hnQuery: "AI product management PM strategy roadmap" },
+  { id: "product",     label: "Product",     hnQuery: "AI product startup launch SaaS founder growth" },
 ];
 
 
@@ -33,31 +33,53 @@ const RSS_FEEDS = {
     { url: "https://techcrunch.com/category/artificial-intelligence/feed/",     source: "TechCrunch",     trusted: true  },
     { url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml", source: "The Verge",      trusted: true  },
     { url: "https://arstechnica.com/ai/feed/",                                  source: "Ars Technica",   trusted: true  },
+    { url: "https://www.anthropic.com/rss.xml",                                 source: "Anthropic",      trusted: true  },
+    { url: "https://openai.com/news/rss/",                                      source: "OpenAI",         trusted: true  },
     { url: "https://www.technologyreview.com/feed/",                            source: "MIT Tech Review", trusted: false },
     { url: "https://venturebeat.com/category/ai/feed/",                         source: "VentureBeat",    trusted: false },
   ],
 
   engineering: [
-    { url: "https://arstechnica.com/ai/feed/",           source: "Ars Technica",   trusted: true  },
-    { url: "https://www.infoq.com/ai-ml-data-eng/rss/", source: "InfoQ",          trusted: true  },
-    { url: "https://simonwillison.net/atom/everything/", source: "Simon Willison", trusted: true  },
-    { url: "https://blog.langchain.dev/rss/",            source: "LangChain",      trusted: true  },
-    { url: "https://openai.com/news/rss/",               source: "OpenAI",         trusted: true  },
-    { url: "https://huggingface.co/blog/feed.xml",       source: "Hugging Face",   trusted: true  },
-    { url: "https://github.blog/feed/",                  source: "GitHub Blog",    trusted: false },
+    { url: "https://arstechnica.com/ai/feed/",                    source: "Ars Technica",   trusted: true  },
+    { url: "https://www.infoq.com/ai-ml-data-eng/rss/",          source: "InfoQ",          trusted: true  },
+    { url: "https://simonwillison.net/atom/everything/",          source: "Simon Willison", trusted: true  },
+    { url: "https://blog.langchain.dev/rss/",                     source: "LangChain",      trusted: true  },
+    { url: "https://openai.com/news/rss/",                        source: "OpenAI",         trusted: true  },
+    { url: "https://huggingface.co/blog/feed.xml",                source: "Hugging Face",   trusted: true  },
+    { url: "https://www.anthropic.com/rss.xml",                   source: "Anthropic",      trusted: true  },
+    { url: "https://thegradient.pub/rss/",                        source: "The Gradient",   trusted: true  },
+    { url: "https://huyenchip.com/feed.xml",                      source: "Chip Huyen",     trusted: true  },
+    { url: "https://lilianweng.github.io/index.xml",              source: "Lil'Log",        trusted: true  },
+    { url: "https://blog.google/technology/ai/rss/",              source: "Google AI",      trusted: true  },
+    { url: "https://mistral.ai/news/rss/",                        source: "Mistral",        trusted: true  },
+    { url: "https://github.blog/feed/",                           source: "GitHub Blog",    trusted: false },
   ],
 
   design: [
-    { url: "https://www.figma.com/blog/feed/",          source: "Figma",      trusted: true  },
-    { url: "https://www.builder.io/blog/rss.xml",       source: "Builder.io", trusted: true  },
-    { url: "https://uxplanet.org/feed",                 source: "UX Planet",  trusted: false },
-    { url: "https://venturebeat.com/category/ai/feed/", source: "VentureBeat", trusted: false },
+    { url: "https://www.figma.com/blog/feed/",             source: "Figma",          trusted: true  },
+    { url: "https://www.builder.io/blog/rss.xml",          source: "Builder.io",     trusted: true  },
+    { url: "https://uxdesign.cc/feed",                     source: "UX Collective",  trusted: true  },
+    { url: "https://www.nngroup.com/feed/rss/",            source: "Nielsen Norman", trusted: true  },
+    { url: "https://www.framer.com/blog/rss.xml",          source: "Framer",         trusted: true  },
+    { url: "https://design.google/library/rss/",           source: "Google Design",  trusted: true  },
+    { url: "https://stability.ai/news/rss.xml",            source: "Stability AI",   trusted: true  },
+    { url: "https://uxplanet.org/feed",                    source: "UX Planet",      trusted: false },
+    { url: "https://blog.adobe.com/en/publish/feed",       source: "Adobe Blog",     trusted: false },
+    { url: "https://www.smashingmagazine.com/feed/",       source: "Smashing Mag",   trusted: false },
+    { url: "https://venturebeat.com/category/ai/feed/",    source: "VentureBeat",    trusted: false },
   ],
 
   product: [
+    { url: "https://www.producthunt.com/feed",                                   source: "Product Hunt",    trusted: true  },
+    { url: "https://www.mindtheproduct.com/feed/",                               source: "Mind the Product", trusted: true  },
+    { url: "https://review.firstround.com/rss.xml",                              source: "First Round",     trusted: true  },
+    { url: "https://svpg.com/feed/",                                             source: "SVPG",            trusted: true  },
+    { url: "https://www.producttalk.org/feed/",                                  source: "Product Talk",    trusted: true  },
+    { url: "https://www.lennysnewsletter.com/feed",                              source: "Lenny's",         trusted: true  },
+    { url: "https://www.ycombinator.com/blog/rss.xml",                           source: "Y Combinator",    trusted: true  },
+    { url: "https://www.reforge.com/blog/rss.xml",                               source: "Reforge",         trusted: true  },
+    { url: "https://every.to/feed",                                              source: "Every.to",        trusted: false },
     { url: "https://a16z.com/feed/",                                             source: "a16z",            trusted: false },
-    { url: "https://www.producthunt.com/feed",                                   source: "Product Hunt",    trusted: false },
-    { url: "https://www.mindtheproduct.com/feed/",                               source: "Mind the Product", trusted: false },
     { url: "https://venturebeat.com/category/ai/feed/",                          source: "VentureBeat",     trusted: false },
     { url: "https://techcrunch.com/category/artificial-intelligence/feed/",      source: "TechCrunch",      trusted: false },
   ],
@@ -126,6 +148,11 @@ const CATEGORY_KEYWORDS = {
     "go-to-market", "gtm", "user research", "product-led", "product strategy",
     "user adoption", "retention", "activation", "north star", "okr",
     "ai assistant", "ai tool", "ai workflow", "copilot",
+    // AI-specific terms missing articles were slipping through
+    "llm", "model", "agent", "generative ai", "foundation model", "ai-powered",
+    "openai", "anthropic", "google", "microsoft", "meta", "gpt", "claude",
+    "gemini", "founder", "build", "ship", "monetiz", "valuation", "funding",
+    "series a", "series b", "venture", "market", "scale",
   ],
 };
 
@@ -159,11 +186,13 @@ const VIDEO_CATEGORY_KEYWORDS = {
 };
 
 
-// ── CORS Proxies (tried in order) ────────────────────────────
+// ── Proxies (tried in order) ──────────────────────────────────
+// First try our own proxy (Vite middleware in dev, api/proxy.js in production)
+// then fall back to third-party CORS proxies.
 const PROXIES = [
+  (u) => `/api/proxy?url=${encodeURIComponent(u)}`,
   (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
   (u) => `https://corsproxy.io/?${encodeURIComponent(u)}`,
-  (u) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`,
 ];
 
 
@@ -214,8 +243,6 @@ function parseRSS(xml, source, isYouTube) {
           .trim()
           .slice(0, 200);
 
-        const category = item.querySelector("category")?.textContent || "";
-
         if (title && link) {
           articles.push({
             title,
@@ -223,7 +250,7 @@ function parseRSS(xml, source, isYouTube) {
             date: pubDate,
             summary: summary + (summary.length >= 200 ? "…" : ""),
             source,
-            tag: category.slice(0, 18) || guessTag(title),
+            tag: guessTag(title),
           });
         }
       });
@@ -472,7 +499,9 @@ function guessTag(title) {
     [["startup", "funding", "raise", "series"], "Startup"],
     [["regulat", "policy", "law", "ban", "safety"], "Policy"],
     [["meta ai", "llama", "meta "], "Meta"],
-    [["dall-e", "midjourney", "stable diffusion", "sora", "image generation"], "GenAI"],
+    [["dall-e", "midjourney", "stable diffusion", "stable diffusion", "sora", "image generation", "stability"], "GenAI"],
+    [["mistral", "llama", "gemma", "qwen", "deepseek"], "Open Models"],
+    [["framer", "webflow", "notion", "linear", "vercel"], "Tools"],
     [["voice", "audio", "speech", "whisper"], "Audio"],
     [["code", "developer", "cursor", "engineer"], "Dev Tools"],
     [["ux", "figma", "creative", "visual design"], "Design"],
