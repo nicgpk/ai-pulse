@@ -17,11 +17,10 @@
 
 // ── Categories ───────────────────────────────────────────────
 export const CATEGORIES = [
-  { id: "general",     label: "Breaking",    hnQuery: "artificial intelligence AI" },
+  { id: "general",     label: "Top Stories", hnQuery: "artificial intelligence AI" },
   { id: "engineering", label: "Engineering", hnQuery: "AI developer tools LLM API coding assistant" },
   { id: "design",      label: "Design",      hnQuery: "AI design tools UX product design figma generative" },
   { id: "product",     label: "Product",     hnQuery: "AI product management PM strategy roadmap" },
-  { id: "videos",      label: "Videos",      hnQuery: null },
 ];
 
 
@@ -31,50 +30,65 @@ export const CATEGORIES = [
 // category-relevant. General sources get filtered.
 const RSS_FEEDS = {
   general: [
-    { url: "https://techcrunch.com/category/artificial-intelligence/feed/", source: "TechCrunch", trusted: true },
-    { url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml", source: "The Verge", trusted: true },
-    { url: "https://arstechnica.com/ai/feed/", source: "Ars Technica", trusted: true },
-    { url: "https://www.technologyreview.com/feed/", source: "MIT Tech Review", trusted: false },
-    { url: "https://venturebeat.com/category/ai/feed/", source: "VentureBeat", trusted: false },
+    { url: "https://techcrunch.com/category/artificial-intelligence/feed/",     source: "TechCrunch",     trusted: true  },
+    { url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml", source: "The Verge",      trusted: true  },
+    { url: "https://arstechnica.com/ai/feed/",                                  source: "Ars Technica",   trusted: true  },
+    { url: "https://www.technologyreview.com/feed/",                            source: "MIT Tech Review", trusted: false },
+    { url: "https://venturebeat.com/category/ai/feed/",                         source: "VentureBeat",    trusted: false },
   ],
 
   engineering: [
-    // Dedicated AI dev sources — trusted (entire feed is relevant)
-    { url: "https://arstechnica.com/ai/feed/", source: "Ars Technica", trusted: true },
-    { url: "https://www.infoq.com/ai-ml-data-eng/rss/", source: "InfoQ", trusted: true },
-    { url: "https://simonwillison.net/atom/everything/", source: "Simon Willison", trusted: true },
-    { url: "https://blog.langchain.dev/rss/", source: "LangChain", trusted: true },
-    // Broader sources — filtered by engineering keywords
-    { url: "https://github.blog/feed/", source: "GitHub Blog", trusted: false },
-    { url: "https://venturebeat.com/category/ai/feed/", source: "VentureBeat", trusted: false },
+    { url: "https://arstechnica.com/ai/feed/",           source: "Ars Technica",   trusted: true  },
+    { url: "https://www.infoq.com/ai-ml-data-eng/rss/", source: "InfoQ",          trusted: true  },
+    { url: "https://simonwillison.net/atom/everything/", source: "Simon Willison", trusted: true  },
+    { url: "https://blog.langchain.dev/rss/",            source: "LangChain",      trusted: true  },
+    { url: "https://openai.com/news/rss/",               source: "OpenAI",         trusted: true  },
+    { url: "https://huggingface.co/blog/feed.xml",       source: "Hugging Face",   trusted: true  },
+    { url: "https://github.blog/feed/",                  source: "GitHub Blog",    trusted: false },
   ],
 
   design: [
-    // Design sources — filtered because they cover non-AI topics too
-    { url: "https://uxdesign.cc/feed", source: "UX Collective", trusted: false },
-    { url: "https://www.nngroup.com/feed/rss/", source: "Nielsen Norman", trusted: false },
-    { url: "https://www.figma.com/blog/feed/", source: "Figma", trusted: false },
+    { url: "https://www.figma.com/blog/feed/",          source: "Figma",      trusted: true  },
+    { url: "https://www.builder.io/blog/rss.xml",       source: "Builder.io", trusted: true  },
+    { url: "https://uxplanet.org/feed",                 source: "UX Planet",  trusted: false },
     { url: "https://venturebeat.com/category/ai/feed/", source: "VentureBeat", trusted: false },
   ],
 
   product: [
-    // Product/PM sources — filtered because they cover non-AI topics too
-    { url: "https://www.lennysnewsletter.com/feed", source: "Lenny's Newsletter", trusted: false },
-    { url: "https://review.firstround.com/feed", source: "First Round Review", trusted: false },
-    { url: "https://www.mindtheproduct.com/feed/", source: "Mind the Product", trusted: false },
-    { url: "https://venturebeat.com/category/ai/feed/", source: "VentureBeat", trusted: false },
-    { url: "https://techcrunch.com/category/artificial-intelligence/feed/", source: "TechCrunch", trusted: false },
+    { url: "https://a16z.com/feed/",                                             source: "a16z",            trusted: false },
+    { url: "https://www.producthunt.com/feed",                                   source: "Product Hunt",    trusted: false },
+    { url: "https://www.mindtheproduct.com/feed/",                               source: "Mind the Product", trusted: false },
+    { url: "https://venturebeat.com/category/ai/feed/",                          source: "VentureBeat",     trusted: false },
+    { url: "https://techcrunch.com/category/artificial-intelligence/feed/",      source: "TechCrunch",      trusted: false },
   ],
+};
 
-  // Verified AI YouTube channel IDs
-  videos: [
-    { url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCbfYPyITQ-7l4upoX8nvctg", source: "Two Minute Papers", trusted: true },
-    { url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCZHmQk67mSJgfCCTn7xBfew", source: "Yannic Kilcher", trusted: true },
-    { url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCSHZKyawb77ixDdsGog4iWA", source: "Lex Fridman", trusted: false },
-    { url: "https://www.youtube.com/feeds/videos.xml?channel_id=UChpleBmo18P08aKCIgti38g", source: "Matt Wolfe", trusted: true },
-    { url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCl6vWwMCjufI8OPtOInHf0g", source: "Google DeepMind", trusted: true },
-    { url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCXUPKJO5MZQN11PqgIvyuvQ", source: "Andrej Karpathy", trusted: true },
-    { url: "https://www.youtube.com/feeds/videos.xml?channel_id=UCVHgDSsGsQhqPUVyoHHzRhg", source: "AI Jason", trusted: true },
+
+// ── Per-category video channels ───────────────────────────────
+// Each tab shows 3 videos from these curated channels.
+// All channel IDs verified against YouTube RSS feeds.
+const YT = (id) => `https://www.youtube.com/feeds/videos.xml?channel_id=${id}`;
+
+const VIDEO_FEEDS = {
+  general: [
+    { url: YT("UCl6vWwMCjufI8OPtOInHf0g"), source: "Google DeepMind",  trusted: true },
+    { url: YT("UCawZsQWqfGSbCI5yjkdVkTA"), source: "Matthew Berman",   trusted: true }, // AI news, models, open source
+    { url: YT("UCVHgDSsGsQhqPUVyoHHzRhg"), source: "AI Jason",         trusted: true },
+  ],
+  engineering: [
+    { url: YT("UCXUPKJO5MZQN11PqgIvyuvQ"), source: "Andrej Karpathy",   trusted: true },
+    { url: YT("UCZHmQk67mSJgfCCTn7xBfew"), source: "Yannic Kilcher",    trusted: true },
+    { url: YT("UCbfYPyITQ-7l4upoX8nvctg"), source: "Two Minute Papers", trusted: true },
+  ],
+  design: [
+    { url: YT("UCQsVmhSa4X-G3lHlUtejzLA"), source: "Figma",      trusted: true  }, // Figma AI features, product design
+    { url: YT("UCeB_OpLspKJGiKv1CYkWFFw"), source: "AJ&Smart",   trusted: false }, // design sprints / UX workshops
+    { url: YT("UC_Dq0oUEi7uXhdUX8prunbw"), source: "Malewicz",   trusted: true  }, // UI/UX, product design, AI tools
+  ],
+  product: [
+    { url: YT("UCcefcZRL2oaA_uBNeo5UOWg"), source: "Y Combinator",   trusted: false },
+    { url: YT("UCVHgDSsGsQhqPUVyoHHzRhg"), source: "AI Jason",        trusted: false }, // filtered to product/business AI
+    { url: YT("UCPjNBjflYl0-HQtUvOx0Ibw"), source: "Greg Isenberg",   trusted: true  }, // AI startup ideas, product building
   ],
 };
 
@@ -115,13 +129,34 @@ const CATEGORY_KEYWORDS = {
   ],
 };
 
-// Video keyword filter for non-trusted channels (e.g. Lex Fridman
-// covers non-AI topics so we filter his videos)
-const VIDEO_KEYWORDS = [
-  "ai", "artificial intelligence", "machine learning", "neural", "gpt",
-  "llm", "chatgpt", "claude", "gemini", "openai", "anthropic", "deepmind",
-  "model", "robot", "agent", "data", "future", "tech", "deep learning",
-];
+// Per-tab video keyword filters — applied to non-trusted channels so
+// the same channel can appear in multiple tabs but only surface
+// topically relevant videos for each tab.
+const VIDEO_CATEGORY_KEYWORDS = {
+  general: [
+    "ai", "artificial intelligence", "machine learning", "neural", "gpt",
+    "llm", "chatgpt", "claude", "gemini", "openai", "anthropic", "deepmind",
+    "model", "robot", "agent", "deep learning",
+  ],
+  engineering: [
+    "code", "coding", "developer", "api", "sdk", "llm", "model", "training",
+    "fine-tun", "paper", "research", "benchmark", "inference", "framework",
+    "rag", "agent", "transformer", "neural", "architecture", "gpu",
+    "machine learning", "deep learning", "open source", "deploy", "embedding",
+  ],
+  design: [
+    "design", "ui", "ux", "figma", "product design", "user experience",
+    "user interface", "prototype", "wireframe", "design system", "component",
+    "ai design", "design tool", "generative ui", "usability", "accessibility",
+    "design thinking", "user research", "design sprint", "adobe", "canva",
+  ],
+  product: [
+    "product", "startup", "founder", "growth", "saas", "revenue", "roadmap",
+    "strategy", "launch", "customer", "b2b", "enterprise", "go-to-market",
+    "product manager", "user research", "retention", "pricing", "business",
+    "market", "scale", "ship", "monetize",
+  ],
+};
 
 
 // ── CORS Proxies (tried in order) ────────────────────────────
@@ -171,6 +206,11 @@ function parseRSS(xml, source, isYouTube) {
           .replace(/<[^>]*>/g, "")
           .replace(/&\w+;/g, " ")
           .replace(/\s+/g, " ")
+          // Strip common RSS boilerplate
+          .replace(/The post .+? appeared first on .+?\./gi, "")
+          .replace(/Continue reading\.?\s*$/i, "")
+          .replace(/Read (more|the full article)\.?\s*$/i, "")
+          .replace(/Click here to read more\.?\s*$/i, "")
           .trim()
           .slice(0, 200);
 
@@ -201,11 +241,12 @@ function filterByRelevance(articles, categoryId, trusted, isVideo) {
   if (trusted) return articles; // Dedicated sources — trust everything
 
   if (isVideo) {
-    // Non-trusted video channels (e.g. Lex Fridman) — filter by AI keywords
-    return articles.filter((v) => {
-      const text = v.title.toLowerCase();
-      return VIDEO_KEYWORDS.some((kw) => text.includes(kw));
-    });
+    // Non-trusted video channels — filter by per-tab keywords so the same
+    // channel surfaces different content depending on which tab it's in.
+    const keywords = VIDEO_CATEGORY_KEYWORDS[categoryId] || VIDEO_CATEGORY_KEYWORDS.general;
+    return articles.filter((v) =>
+      keywords.some((kw) => v.title.toLowerCase().includes(kw))
+    );
   }
 
   const keywords = CATEGORY_KEYWORDS[categoryId];
@@ -250,11 +291,10 @@ async function fetchOneFeed(feed, isYouTube, categoryId) {
 // ── Fetch all feeds in parallel ───────────────────────────────
 async function fetchRSSFeeds(categoryId) {
   const feeds = RSS_FEEDS[categoryId] || [];
-  const isYouTube = categoryId === "videos";
 
   // All feeds run at the same time — total wait = slowest feed, not sum
   const results = await Promise.allSettled(
-    feeds.map((feed) => fetchOneFeed(feed, isYouTube, categoryId))
+    feeds.map((feed) => fetchOneFeed(feed, false, categoryId))
   );
 
   return results
@@ -304,7 +344,7 @@ async function fetchFromHN(categoryId) {
 }
 
 
-// ── Main export ───────────────────────────────────────────────
+// ── Main article export ───────────────────────────────────────
 export async function fetchNews(categoryId, onStatus) {
   onStatus("Loading…");
 
@@ -312,32 +352,49 @@ export async function fetchNews(categoryId, onStatus) {
     const rssResults = await fetchRSSFeeds(categoryId);
     if (rssResults.length > 0) {
       onStatus("via RSS");
-      return categoryId === "videos"
-        ? deduplicateVideos(rssResults)
-        : deduplicateArticles(rssResults);
+      return deduplicateArticles(rssResults);
     }
   } catch (err) {
     console.warn("RSS failed:", err.message);
   }
 
-  if (categoryId !== "videos") {
-    onStatus("Trying Hacker News…");
-    try {
-      const hnResults = await fetchFromHN(categoryId);
-      if (hnResults.length > 0) {
-        onStatus("via Hacker News");
-        return deduplicateArticles(hnResults);
-      }
-    } catch (err) {
-      console.warn("HN fallback failed:", err.message);
+  onStatus("Trying Hacker News…");
+  try {
+    const hnResults = await fetchFromHN(categoryId);
+    if (hnResults.length > 0) {
+      onStatus("via Hacker News");
+      return deduplicateArticles(hnResults);
     }
+  } catch (err) {
+    console.warn("HN fallback failed:", err.message);
   }
 
-  throw new Error(
-    categoryId === "videos"
-      ? "Could not load videos — CORS proxies may be unavailable. Try refreshing."
-      : "Could not load articles. Check your connection and try refreshing."
+  throw new Error("Could not load articles. Check your connection and try refreshing.");
+}
+
+
+// ── Video export (4 videos per category) ─────────────────────
+export async function fetchVideos(categoryId) {
+  const feeds = VIDEO_FEEDS[categoryId] || [];
+  const TARGET = 4;
+
+  const results = await Promise.allSettled(
+    feeds.map((feed) => fetchOneFeed(feed, true, categoryId))
   );
+
+  const channelResults = results
+    .filter((r) => r.status === "fulfilled" && r.value.length > 0)
+    .map((r) => r.value);
+
+  // First pass: one per channel
+  const first = channelResults.map((vids) => vids[0]);
+  if (first.length >= TARGET) {
+    return deduplicateVideos(first).slice(0, TARGET);
+  }
+
+  // Second pass: fill remaining slots with 2nd video from channels that have one
+  const second = channelResults.flatMap((vids) => vids.slice(1, 2));
+  return deduplicateVideos([...first, ...second]).slice(0, TARGET);
 }
 
 
@@ -356,7 +413,7 @@ function deduplicateArticles(articles) {
   });
 
   return results
-    .map((a) => ({ ...a, date: formatDate(a.date) }));
+    .map((a) => ({ ...a, rawDate: a.date, date: formatDate(a.date) }));
 }
 
 function deduplicateVideos(videos) {
