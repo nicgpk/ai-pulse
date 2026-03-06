@@ -147,43 +147,10 @@ body {
 }
 
 
-/* ── Tab Navigation (mirrors btn-group) ───────────────────── */
-.tab-nav {
-  display: flex;
-  gap: var(--spacing-1);
-  flex-wrap: wrap;
-  padding: var(--spacing-4) 0 0;
-}
-
-.tab-btn {
-  background: transparent;
-  color: var(--color-muted-foreground);
-  border: 1px solid transparent;
-  border-radius: var(--radius-md);
-  padding: var(--spacing-2) var(--spacing-4);
-  font-size: 0.875rem;
-  font-weight: 400;
-  font-family: inherit;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  line-height: 1.5;
-}
-
-.tab-btn:hover {
-  color: var(--color-foreground);
-  background: var(--color-secondary);
-}
-
-.tab-btn:focus-visible {
-  outline: none;
-  box-shadow: var(--shadow-focus-ring);
-}
-
-.tab-btn[data-active="true"] {
-  background: var(--color-secondary);
-  color: var(--color-foreground);
-  border-color: var(--color-border-strong);
-  font-weight: 500;
+/* ── Tab Navigation ───────────────────────────────────────── */
+/* Uses midashands tab.css — .tab-list + .tab-trigger */
+.tab-list {
+  padding-top: var(--spacing-4);
 }
 
 
@@ -207,6 +174,10 @@ body {
   color: var(--color-muted-foreground);
 }
 
+.status-updated {
+  opacity: 0.6;
+}
+
 .status-source {
   font-size: 0.6875rem;
   color: var(--color-muted-foreground);
@@ -218,6 +189,11 @@ body {
 .news-card {
   display: block;
   animation: fadeIn 0.3s ease both;
+}
+
+.news-card:visited .news-card-title,
+.news-card:visited .news-card-source {
+  opacity: 0.5;
 }
 
 .news-card-inner {
@@ -274,21 +250,57 @@ body {
   max-width: 40rem;
 }
 
+/* ── Compact density ─────────────────────────────────────── */
+.news-card--compact .news-card-inner {
+  padding: var(--spacing-2) 0;
+}
+.news-card--compact .news-card-title {
+  font-size: 0.9375rem;
+  margin-bottom: 0;
+}
+
+
+/* ── Video Section ────────────────────────────────────────── */
+.video-section {
+  margin-top: var(--spacing-8);
+  margin-bottom: var(--spacing-8);
+}
+
+.video-section-title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: var(--spacing-4);
+}
 
 /* ── Video Card ───────────────────────────────────────────── */
 .video-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: var(--spacing-4);
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-3);
   padding-top: var(--spacing-3);
+  align-items: stretch;
+}
+
+@media (max-width: 640px) {
+  .video-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .video-card {
-  display: block;
+  display: flex;
+  flex-direction: column;
   animation: fadeIn 0.3s ease both;
+  height: 100%;
 }
 
 .video-card-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
   overflow: hidden;
@@ -302,10 +314,11 @@ body {
 }
 
 .video-card-thumb {
-  height: 160px;
+  aspect-ratio: 16 / 9;
   position: relative;
   background: var(--color-secondary);
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .video-card-thumb img {
@@ -324,8 +337,8 @@ body {
 }
 
 .video-card-play {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius-full);
   background: var(--color-primary);
   display: flex;
@@ -335,20 +348,24 @@ body {
 
 .video-card-play span {
   color: var(--color-primary-foreground);
-  font-size: 14px;
+  font-size: 12px;
   margin-left: 2px;
 }
 
 .video-card-body {
-  padding: var(--spacing-3) var(--spacing-4);
+  padding: var(--spacing-2) var(--spacing-3);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .video-card-title {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 500;
   line-height: 1.4;
   color: var(--color-foreground);
   margin-bottom: var(--spacing-1);
+  flex: 1;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -356,8 +373,59 @@ body {
 }
 
 .video-card-channel {
-  font-size: 0.75rem;
+  font-size: 0.6875rem;
   color: var(--color-muted-foreground);
+  margin-top: auto;
+}
+
+
+/* ── Date filter ──────────────────────────────────────────── */
+.filter-group {
+  display: flex;
+  gap: 2px;
+}
+
+.filter-btn {
+  background: transparent;
+  color: var(--color-muted-foreground);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 2px var(--spacing-2);
+  font-size: 0.6875rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  line-height: 1.5;
+}
+
+.filter-btn:hover {
+  color: var(--color-foreground);
+  background: var(--color-secondary);
+}
+
+.filter-btn[data-active="true"] {
+  color: var(--color-foreground);
+  background: var(--color-secondary);
+  border-color: var(--color-border);
+}
+
+
+/* ── Video skeleton ───────────────────────────────────────── */
+.video-skeleton-card {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  animation: fadeIn 0.3s ease both;
+}
+
+.video-skeleton-thumb {
+  aspect-ratio: 16 / 9;
+  background: var(--color-secondary);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.video-skeleton-body {
+  padding: var(--spacing-2) var(--spacing-3);
 }
 
 
@@ -396,33 +464,26 @@ body {
 }
 
 
-/* ── Tab ready dot (pre-fetched indicator) ────────────────── */
-.tab-btn {
-  position: relative;
-}
-
-.tab-ready-dot {
-  display: inline-block;
-  width: 5px;
-  height: 5px;
-  border-radius: var(--radius-full);
-  background: var(--color-muted-foreground);
-  margin-left: var(--spacing-1);
-  opacity: 0.5;
-  vertical-align: middle;
-}
-
-
 /* ── Footer ───────────────────────────────────────────────── */
 .footer {
   border-top: 1px solid var(--color-border-subtle);
   padding: var(--spacing-4) 0;
-  text-align: center;
 }
 
-.footer span {
+.footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.footer-brand,
+.footer-meta {
   font-size: 0.75rem;
   color: var(--color-muted-foreground);
+}
+
+.footer-meta {
+  opacity: 0.6;
 }
 
 
@@ -536,8 +597,8 @@ body {
 }
 
 @keyframes logo-pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(0.8); }
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(0.7); opacity: 0.3; }
 }
 
 @keyframes spin {

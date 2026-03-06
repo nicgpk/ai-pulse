@@ -1,19 +1,52 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { CATEGORIES, fetchNews } from "./feeds.js";
+import { CATEGORIES, fetchNews, fetchVideos } from "./feeds.js";
 import "./tokens.css";
+import "./tab.css";
 import "./styles.css";
 
 const PAGE_SIZE = 10;
 
+// ── Date filter helper ────────────────────────────────────────
+function filterByDate(articles, filter) {
+  if (filter === "all") return articles;
+  const cutoff = filter === "today" ? 24 * 3_600_000 : 7 * 24 * 3_600_000;
+  const now = Date.now();
+  return articles.filter((a) => {
+    if (!a.rawDate) return true; // no date info — show it
+    try {
+      return now - new Date(a.rawDate).getTime() <= cutoff;
+    } catch {
+      return true;
+    }
+  });
+}
+
+function formatRelativeTime(ts) {
+  const mins = Math.floor((Date.now() - ts) / 60_000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  return `${Math.floor(mins / 60)}h ago`;
+}
+
 export default function App() {
   // ── State ────────────────────────────────────────────────
   const [theme, setTheme] = useState("dark");
-  const [activeCategory, setActiveCategory] = useState("general");
+  const [density, setDensity] = useState(
+    () => localStorage.getItem("pulse-density") || "comfortable"
+  );
+  const [activeCategory, setActiveCategory] = useState(() => {
+    const tab = new URLSearchParams(window.location.search).get("tab");
+    return CATEGORIES.find((c) => c.id === tab) ? tab : "general";
+  });
   const [cache, setCache] = useState({});
+  const [lastUpdated, setLastUpdated] = useState({});
+  const [videoCache, setVideoCache] = useState({});
+  const [videoLoading, setVideoLoading] = useState({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [status, setStatus] = useState("");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [dateFilter, setDateFilter] = useState("all");
   const sentinelRef = useRef(null);
 
   // ── Theme ────────────────────────────────────────────────
@@ -23,12 +56,25 @@ export default function App() {
 
   const toggleTheme = () => setTheme((t) => (t === "dark" ? "light" : "dark"));
 
+  const toggleDensity = () =>
+    setDensity((d) => {
+      const next = d === "comfortable" ? "compact" : "comfortable";
+      localStorage.setItem("pulse-density", next);
+      return next;
+    });
+
+  const handleTabChange = (id) => {
+    setActiveCategory(id);
+    const params = new URLSearchParams(window.location.search);
+    params.set("tab", id);
+    history.replaceState(null, "", `?${params}`);
+  };
+
   // ── Data Loading ─────────────────────────────────────────
   const loadCategory = useCallback(
     async (categoryId, forceRefresh = false) => {
       if (!forceRefresh && cache[categoryId]?.length > 0) return;
 
-      // Only show loading state for the active tab
       if (categoryId === activeCategory) {
         setLoading(true);
         setError(null);
@@ -41,6 +87,7 @@ export default function App() {
           categoryId === activeCategory ? setStatus : () => {}
         );
         setCache((prev) => ({ ...prev, [categoryId]: articles }));
+        setLastUpdated((prev) => ({ ...prev, [categoryId]: Date.now() }));
       } catch (err) {
         if (categoryId === activeCategory) setError(err.message);
       } finally {
@@ -50,27 +97,61 @@ export default function App() {
     [cache, activeCategory]
   );
 
+  const loadVideos = useCallback((categoryId) => {
+    setVideoLoading((prev) => ({ ...prev, [categoryId]: true }));
+    fetchVideos(categoryId)
+      .then((vids) => setVideoCache((prev) => ({ ...prev, [categoryId]: vids })))
+      .catch(() => setVideoCache((prev) => ({ ...prev, [categoryId]: [] })))
+      .finally(() => setVideoLoading((prev) => ({ ...prev, [categoryId]: false })));
+  }, []);
+
   // Load active tab immediately, then pre-fetch all others in background
   useEffect(() => {
     loadCategory(activeCategory);
   }, [activeCategory]);
 
   useEffect(() => {
-    // After mount, silently pre-fetch every other category
     const others = CATEGORIES.filter((c) => c.id !== activeCategory);
     others.forEach((c) => loadCategory(c.id));
   }, []); // once on mount
 
-  // Reset pagination when tab changes
+  // Fetch videos for the active tab (cached)
+  useEffect(() => {
+    if (videoCache[activeCategory]) return;
+    loadVideos(activeCategory);
+  }, [activeCategory]);
+
+  // Reset pagination and filter on tab change
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
+    setDateFilter("all");
   }, [activeCategory]);
+
+  // Reset pagination on filter change
+  useEffect(() => {
+    setVisibleCount(PAGE_SIZE);
+  }, [dateFilter]);
 
   // ── Derived values ───────────────────────────────────────
   const articles = cache[activeCategory] || [];
-  const isVideo = activeCategory === "videos";
-  const visibleArticles = articles.slice(0, visibleCount);
-  const hasMore = articles.length > visibleCount;
+  const filteredArticles = filterByDate(articles, dateFilter);
+  const videos = videoCache[activeCategory] || [];
+  const isVideoLoading = videoLoading[activeCategory] ?? false;
+  const visibleArticles = filteredArticles.slice(0, visibleCount);
+  const hasMore = filteredArticles.length > visibleCount;
+  const updatedAt = lastUpdated[activeCategory];
+
+  // Status text
+  const updatedText = updatedAt ? `Updated ${formatRelativeTime(updatedAt)}` : "";
+  const statusText = loading
+    ? status
+    : articles.length > 0
+    ? dateFilter !== "all"
+      ? filteredArticles.length > 0
+        ? `${filteredArticles.length} of ${articles.length} stories`
+        : "No stories in this period"
+      : `${articles.length} stories`
+    : "";
 
   // Infinite scroll — load next page when sentinel enters viewport
   useEffect(() => {
@@ -84,7 +165,7 @@ export default function App() {
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [articles, visibleCount]);
+  }, [filteredArticles, visibleCount]);
 
   // ── Render ───────────────────────────────────────────────
   return (
@@ -98,13 +179,12 @@ export default function App() {
               <h1 className="header-title">Pulse</h1>
             </div>
             <div className="header-actions">
-              <button
-                className={`btn btn-outline btn-sm ${loading ? "spinning" : ""}`}
-                onClick={() => loadCategory(activeCategory, true)}
-                disabled={loading}
-                aria-label="Refresh"
+<button
+                className="btn btn-outline btn-sm"
+                onClick={toggleDensity}
+                aria-label={density === "comfortable" ? "Switch to compact view" : "Switch to comfortable view"}
               >
-                ↻
+                {density === "comfortable" ? "Compact" : "Readable"}
               </button>
               <label className="theme-toggle toggle toggle-sm" aria-label="Toggle theme">
                 <input
@@ -125,43 +205,53 @@ export default function App() {
 
       {/* ── TAB NAVIGATION ── */}
       <nav className="app-inner">
-        <div className="tab-nav" role="tablist">
+        <ul className="tab-list" role="tablist">
           {CATEGORIES.map((cat) => (
-            <button
-              key={cat.id}
-              className="tab-btn"
-              data-active={activeCategory === cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              role="tab"
-              aria-selected={activeCategory === cat.id}
-            >
-              {cat.label}
-              {/* Dot indicator when pre-fetched and ready */}
-              {cat.id !== activeCategory && cache[cat.id]?.length > 0 && (
-                <span className="tab-ready-dot" aria-hidden="true" />
-              )}
-            </button>
+            <li key={cat.id} role="presentation">
+              <button
+                className="tab-trigger"
+                role="tab"
+                aria-selected={activeCategory === cat.id}
+                onClick={() => handleTabChange(cat.id)}
+              >
+                {cat.label}
+              </button>
+            </li>
           ))}
-        </div>
+        </ul>
       </nav>
 
       {/* ── CONTENT ── */}
       <main className="app-inner content">
         <div className="status-bar">
           <span className="status-text">
-            {loading
-              ? status
-              : articles.length > 0
-              ? `${visibleCount < articles.length ? `${visibleCount} of ` : ""}${articles.length} stories`
-              : ""}
+            {statusText}
+            {!loading && updatedText && (
+              <span className="status-updated"> · {updatedText}</span>
+            )}
           </span>
-          {!loading && status && articles.length > 0 && (
-            <span className="status-source">{status}</span>
+          {!loading && articles.length > 0 && (
+            <div className="filter-group" role="group" aria-label="Date filter">
+              {[
+                { id: "today", label: "Today" },
+                { id: "week",  label: "Week"  },
+                { id: "all",   label: "All"   },
+              ].map((f) => (
+                <button
+                  key={f.id}
+                  className="filter-btn"
+                  data-active={dateFilter === f.id}
+                  onClick={() => setDateFilter(f.id)}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
           )}
         </div>
 
         {loading ? (
-          <LoadingSkeleton isVideo={isVideo} />
+          <LoadingSkeleton />
         ) : error && articles.length === 0 ? (
           <div className="empty-state">
             <p>{error}</p>
@@ -182,31 +272,52 @@ export default function App() {
               Refresh
             </button>
           </div>
-        ) : isVideo ? (
-          <>
-            <div className="video-grid">
-              {visibleArticles.map((video, i) => (
-                <VideoCard key={video.videoId || i} video={video} index={i} />
-              ))}
-            </div>
-            {hasMore && <div ref={sentinelRef} style={{ height: 1 }} />}
-          </>
         ) : (
           <>
-            <div>
-              {visibleArticles.map((article, i) => (
-                <NewsCard key={article.url || i} article={article} index={i} />
-              ))}
-            </div>
-            {hasMore && <div ref={sentinelRef} style={{ height: 1 }} />}
+            {/* Videos first — above the fold */}
+            {isVideoLoading ? (
+              <VideoLoadingSkeleton />
+            ) : videos.length > 0 ? (
+              <div className="video-section">
+                <h2 className="video-section-title">Watch</h2>
+                <div className="video-grid">
+                  {videos.map((v, i) => (
+                    <VideoCard key={v.videoId || i} video={v} index={i} />
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            {/* Articles */}
+            {filteredArticles.length === 0 ? (
+              <div className="empty-state">
+                <p>No stories from this period.</p>
+                <button
+                  className="btn btn-outline"
+                  onClick={() => setDateFilter("all")}
+                >
+                  Show all stories
+                </button>
+              </div>
+            ) : (
+              <>
+                {visibleArticles.map((article, i) => (
+                  <NewsCard key={article.url || i} article={article} index={i} compact={density === "compact"} />
+                ))}
+                {hasMore && <div ref={sentinelRef} style={{ height: 1 }} />}
+              </>
+            )}
           </>
         )}
       </main>
 
       {/* ── FOOTER ── */}
       <footer className="footer">
-        <div className="app-inner">
-          <span>Pulse</span>
+        <div className="app-inner footer-inner">
+          <span className="footer-brand">Pulse</span>
+          {updatedAt && (
+            <span className="footer-meta">Last updated {updatedText}</span>
+          )}
         </div>
       </footer>
     </div>
@@ -239,13 +350,13 @@ function PulseLogo() {
 //  SUB-COMPONENTS
 // ═══════════════════════════════════════════════════════════════
 
-function NewsCard({ article, index }) {
+function NewsCard({ article, index, compact }) {
   return (
     <a
       href={article.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="news-card"
+      className={`news-card${compact ? " news-card--compact" : ""}`}
       style={{ animationDelay: `${index * 40}ms` }}
     >
       <div className="news-card-inner">
@@ -255,7 +366,7 @@ function NewsCard({ article, index }) {
           <span className="news-card-date">{article.date}</span>
         </div>
         <h3 className="news-card-title">{article.title}</h3>
-        {article.summary && (
+        {!compact && article.summary && (
           <p className="news-card-summary">{article.summary}</p>
         )}
       </div>
@@ -303,39 +414,7 @@ function VideoCard({ video, index }) {
   );
 }
 
-function LoadingSkeleton({ isVideo }) {
-  if (isVideo) {
-    return (
-      <div className="video-grid">
-        {[...Array(6)].map((_, i) => (
-          <div
-            key={i}
-            style={{
-              borderRadius: "var(--radius-lg)",
-              overflow: "hidden",
-              border: "1px solid var(--color-border-subtle)",
-            }}
-          >
-            <div
-              className="skeleton-line"
-              style={{ height: 160, borderRadius: 0, animationDelay: `${i * 100}ms` }}
-            />
-            <div style={{ padding: "var(--spacing-3) var(--spacing-4)" }}>
-              <div
-                className="skeleton-line"
-                style={{ height: 14, width: "80%", marginBottom: "var(--spacing-2)", animationDelay: `${i * 100}ms` }}
-              />
-              <div
-                className="skeleton-line-subtle"
-                style={{ height: 12, width: "45%", animationDelay: `${i * 100}ms` }}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
+function LoadingSkeleton() {
   return (
     <div>
       {[...Array(6)].map((_, i) => (
@@ -354,6 +433,26 @@ function LoadingSkeleton({ isVideo }) {
           <div className="skeleton-line-subtle" style={{ height: 14, width: "85%", animationDelay: `${i * 100}ms` }} />
         </div>
       ))}
+    </div>
+  );
+}
+
+function VideoLoadingSkeleton() {
+  return (
+    <div className="video-section">
+      <div className="skeleton-line" style={{ height: 11, width: 52, marginBottom: "var(--spacing-4)" }} />
+      <div className="video-grid">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="video-skeleton-card" style={{ animationDelay: `${i * 80}ms` }}>
+            <div className="video-skeleton-thumb" />
+            <div className="video-skeleton-body">
+              <div className="skeleton-line" style={{ height: 14, width: "80%", marginBottom: "var(--spacing-2)" }} />
+              <div className="skeleton-line" style={{ height: 14, width: "55%", marginBottom: "var(--spacing-2)" }} />
+              <div className="skeleton-line-subtle" style={{ height: 12, width: "40%" }} />
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
